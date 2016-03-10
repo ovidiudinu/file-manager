@@ -1,0 +1,9 @@
+*~
+*.log
+node_modules
+browser-bundle.js
+browser-bundle.js.map
+
+# https://www.jetbrains.com/idea/help/managing-projects-under-version-control.html
+.idea/workspace.xml
+.idea/tasks.xml
