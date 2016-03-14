@@ -11,6 +11,11 @@
                     -ms-transition: opacity 0.4s ease-in-out;
                     -o-transition: opacity 0.4s ease-in-out;
                     transition: opacity 0.4s ease-in-out;
+	                height: 105px;
+	                img {
+		                height: 100% !important;
+		                object-fit: cover;
+	                }
                     .button {
                         position: absolute;
                         top: 0;

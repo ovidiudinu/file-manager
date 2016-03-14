@@ -7,3 +7,4 @@ browser-bundle.js.map
 # https://www.jetbrains.com/idea/help/managing-projects-under-version-control.html
 .idea/workspace.xml
 .idea/tasks.xml
+.idea/deployment.xml

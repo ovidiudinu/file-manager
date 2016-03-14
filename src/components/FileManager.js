@@ -9,6 +9,7 @@ var images = [
 	'/uploads/img_0002.jpg',
 	'/uploads/img_0003.jpg',
 	'/uploads/img_0004.jpg',
+	'/uploads/Earth-logo.gif',
 	'/uploads/img_0005.jpg',
 	'/uploads/img_0006.jpg',
 	'/uploads/img_0007.jpg',

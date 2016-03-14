@@ -1,4 +1,22 @@
 .modal.image {
+	.four.wide.column {
+		padding: 0;
+		height: 132px;
+		.segment {
+			padding: 5px;
+			height: 100% !important;
+			img {
+				border-radius: inherit;
+				height: 100% !important;
+				object-fit: cover;
+			}
+		}
+	}
+	.twelve.wide.column {
+		padding-top: 0;
+		padding-right: 0;
+		padding-bottom: 0;
+	}
 	.drop-zone {
 		padding: 2em 1em !important;
 		position: relative;

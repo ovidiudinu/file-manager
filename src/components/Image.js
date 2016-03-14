@@ -69,12 +69,6 @@ export default class Image extends React.Component {
 			);
 		}
 
-        var clearButton = (
-            <button className="ui icon red button" onClick={onClearField.bind(this)}>
-                <i className="close icon"/>
-            </button>
-        );
-
 		return (
             <div className="ui small modal image">
 				<div className="header">
@@ -82,37 +76,43 @@ export default class Image extends React.Component {
 				</div>
 				<div className="ui content">
 					<div ref="form" className="ui form">
-						<div className="two fields">
-							<div className="ten wide field">
-								<label>Iamge URL</label>
-								<div className="ui action input fluid">
-									<input ref="path"
-                                           data-state="path"
-									       value={this.state.path}
-									       type="text"
-									       placeholder="Insert link or select from gallery..."
-									       onChange={onPathChange.bind(this)}
-									/>
-									<button className="ui icon blue button show-gallery" onClick={openGallery.bind(this)}>
-										<i className="folder open icon"/>
-									</button>
-                                    {this.state.path ? clearButton : undefined}
+						<div className="ui padded fluid grid">
+							<div className="four wide column">
+								<div className="ui segment">
+									<img className="ui fluid image" src={this.state.path ? this.state.path : '/img/blank.png'}/>
 								</div>
 							</div>
-							<div className="six wide field">
-								<label>Iamge ALT</label>
-                                <div className={"ui input fluid " + (this.state.alt ? 'action' : null)}>
-                                    <input ref="alt"
-                                           data-state="alt"
-                                           value={this.state.alt}
-                                           type="text"
-                                           placeholder="Alt text"
-                                           onChange={onAltChange.bind(this)}
-                                    />
-                                    {this.state.alt ? clearButton : undefined}
-							    </div>
+							<div className="twelve wide column">
+								<div className="field">
+									<label>Iamge URL</label>
+									<div className="ui action input fluid">
+										<input ref="path"
+										       data-state="path"
+										       value={this.state.path}
+										       type="text"
+										       placeholder="Insert link or select from gallery..."
+										       onChange={onPathChange.bind(this)}
+										/>
+										<button className="ui icon button show-gallery" onClick={openGallery.bind(this)}>
+											<i className="folder open icon"/>
+										</button>
+									</div>
+								</div>
+								<div className="field">
+									<label>Iamge ALT</label>
+									<div className={"ui input fluid"}>
+										<input ref="alt"
+										       data-state="alt"
+										       value={this.state.alt}
+										       type="text"
+										       placeholder="Alt text"
+										       onChange={onAltChange.bind(this)}
+										/>
+									</div>
+								</div>
 							</div>
 						</div>
+
 						<div className="ui horizontal divider">Or</div>
 						<div className="ui divider hidden"></div>
 						<div className="ui cards">
