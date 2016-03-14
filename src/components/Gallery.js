@@ -19,11 +19,15 @@ export default class Gallery extends React.Component {
 			inverted: true,
 			transition: 'scale',
 			allowMultiple: true,
-			//observeChanges: true,
+			observeChanges: true,
 			closable: false
 		});
-		$(ReactDOM.findDOMNode(this)).modal('attach events', '.image.modal .show-gallery');
 	}
+
+    show(callBack) {
+        this._callBack = callBack;
+        $(ReactDOM.findDOMNode(this)).modal('show');
+    }
 
 	componentDidUpdate() {
 		$(ReactDOM.findDOMNode(this)).modal('refresh');
@@ -38,7 +42,7 @@ export default class Gallery extends React.Component {
 				<a className={'card ' + selected} key={'thumbnail ' + index}>
 					<div className="image">
 						<img className="ui image" src={path} onClick={onThumbnailSelect.bind(this)}/>
-						<button className="circular ui icon button red" onClick={onThumbnailDelete.bind(this)}>
+						<button className="ui icon red mini button" onClick={onThumbnailDelete.bind(this)}>
 							<i className="icon trash"/>
 						</button>
 					</div>
@@ -46,7 +50,7 @@ export default class Gallery extends React.Component {
 			);
 		}.bind(this));
 		return (
-			<div className="ui large modal coupled gallery">
+			<div className="ui large modal gallery">
 				<div className="header">
 					Image Gallery
 				</div>

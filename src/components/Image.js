@@ -24,6 +24,7 @@ export default class Image extends React.Component {
 			transition: 'scale',
 			allowMultiple: true,
 			observeChanges: true,
+            closable: false,
 			onHidden: () => {
 				// if (this._cb) {
 				// 	this._cb(null)
@@ -68,8 +69,14 @@ export default class Image extends React.Component {
 			);
 		}
 
+        var clearButton = (
+            <button className="ui icon red button" onClick={onClearField.bind(this)}>
+                <i className="close icon"/>
+            </button>
+        );
+
 		return (
-			<div className="ui small modal coupled image">
+            <div className="ui small modal image">
 				<div className="header">
 					Insert Image
 				</div>
@@ -80,24 +87,30 @@ export default class Image extends React.Component {
 								<label>Iamge URL</label>
 								<div className="ui action input fluid">
 									<input ref="path"
+                                           data-state="path"
 									       value={this.state.path}
 									       type="text"
 									       placeholder="Insert link or select from gallery..."
 									       onChange={onPathChange.bind(this)}
 									/>
-									<button className="ui icon button show-gallery">
+									<button className="ui icon blue button show-gallery" onClick={openGallery.bind(this)}>
 										<i className="folder open icon"/>
 									</button>
+                                    {this.state.path ? clearButton : undefined}
 								</div>
 							</div>
 							<div className="six wide field">
 								<label>Iamge ALT</label>
-								<input ref="alt"
-								       value={this.state.alt}
-								       type="text"
-								       placeholder="Alt text"
-								       onChange={onAltChange.bind(this)}
-								/>
+                                <div className={"ui input fluid " + (this.state.alt ? 'action' : null)}>
+                                    <input ref="alt"
+                                           data-state="alt"
+                                           value={this.state.alt}
+                                           type="text"
+                                           placeholder="Alt text"
+                                           onChange={onAltChange.bind(this)}
+                                    />
+                                    {this.state.alt ? clearButton : undefined}
+							    </div>
 							</div>
 						</div>
 						<div className="ui horizontal divider">Or</div>
@@ -151,8 +164,13 @@ export default class Image extends React.Component {
 
 Image.propTypes = {
 	path: React.PropTypes.string,
-	alt: React.PropTypes.string
+	alt: React.PropTypes.string,
+    onOpenGallery: React.PropTypes.func
 };
+
+function openGallery() {
+    this.props.onOpenGallery();
+}
 
 function onPathChange(event) {
 	this.setPath(event.target.value);
@@ -234,4 +252,18 @@ function uploadFiles(files) {
 	}.bind(this);
 
 	xhr.send(formData);
+}
+
+function onClearField(event) {
+    var $field = $(event.target).closest('.input').find('input');
+    if($field.data('state') == 'path'){
+        this.setState({
+            path: null
+        });
+    }
+    if($field.data('state') == 'alt'){
+        this.setState({
+            alt: null
+        });
+    }
 }
