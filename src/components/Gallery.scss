@@ -1,4 +1,9 @@
 .modal.gallery {
+    .close.icon {
+        top: 1.0535rem;
+        right: 1rem;
+        color: rgba(0,0,0,.87);
+    }
     .content {
         max-height: 430px;
         overflow-y: auto;
@@ -48,6 +53,21 @@
                     }
                 }
             }
+        }
+    }
+    .progress {
+        margin-top: 0;
+        margin-bottom: 20px;
+        .label {
+            text-align: left;
+        }
+    }
+    .drop-zone.dragover {
+        display: block;
+        opacity: 1;
+        .content {
+            height: 100%;
+            max-height: none;
         }
     }
 }

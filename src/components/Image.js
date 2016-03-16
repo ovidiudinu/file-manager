@@ -2,6 +2,7 @@ require('./Image.scss');
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {onDragOver, onDragOut, onDropFiles, onPaste, uploadFiles} from './Methods'
 
 export default class Image extends React.Component {
 	constructor(props) {
@@ -79,19 +80,20 @@ export default class Image extends React.Component {
 						<div className="ui padded fluid grid">
 							<div className="four wide column">
 								<div className="ui segment">
-									<img className="ui fluid image" src={this.state.path ? this.state.path : '/img/blank.png'}/>
+									<img className="ui fluid image" src={this.state.path ? this.state.path : '/img/blank.png'} onClick={openGallery.bind(this)}/>
 								</div>
 							</div>
 							<div className="twelve wide column">
 								<div className="field">
-									<label>Iamge URL</label>
+									<label>URL</label>
 									<div className="ui action input fluid">
 										<input ref="path"
 										       data-state="path"
 										       value={this.state.path}
 										       type="text"
-										       placeholder="Insert link or select from gallery..."
+										       placeholder="Insert link, select from gallery or paste image data..."
 										       onChange={onPathChange.bind(this)}
+                                               onPaste={onPaste.bind(this)}
 										/>
 										<button className="ui icon button show-gallery" onClick={openGallery.bind(this)}>
 											<i className="folder open icon"/>
@@ -99,7 +101,7 @@ export default class Image extends React.Component {
 									</div>
 								</div>
 								<div className="field">
-									<label>Iamge ALT</label>
+									<label>ALT</label>
 									<div className={"ui input fluid"}>
 										<input ref="alt"
 										       data-state="alt"
@@ -113,6 +115,7 @@ export default class Image extends React.Component {
 							</div>
 						</div>
 
+                        <div className="ui divider hidden"></div>
 						<div className="ui horizontal divider">Or</div>
 						<div className="ui divider hidden"></div>
 						<div className="ui cards">
@@ -183,87 +186,4 @@ function onAltChange(event) {
 function onManualUploadChange(event) {
 	var files = event.target.files;
 	uploadFiles.call(this, files);
-}
-
-function onDragOver(event) {
-	event.preventDefault();
-	this.setState({
-		dragOver: true
-	});
-}
-
-function onDragOut(event) {
-	event.preventDefault();
-	this.setState({
-		dragOver: false
-	});
-}
-
-function onDropFiles(event) {
-	event.preventDefault();
-	var files = event.dataTransfer.files;
-	uploadFiles.call(this, files);
-	this.setState({
-		dragOver: false
-	});
-}
-
-function uploadFiles(files) {
-	this.setState({
-		uploading: true,
-		uploadError: false,
-		uploadProgress: 0
-	});
-
-	var formData = new FormData();
-	for (var i = 0; i < files.length; i++) {
-		formData.append('file', files[i]);
-	}
-
-	var xhr = new XMLHttpRequest();
-	xhr.open('POST', './upload.php');
-	xhr.onload = function() {
-		this.setState({
-			uploadProgress: 100
-		});
-	}.bind(this);
-	xhr.onreadystatechange = function() {
-		if (xhr.readyState == 4 && xhr.status == 200) {
-			this.setState({
-				uploading: false,
-				uploadProgress: 0
-			});
-			this.setPath(files[0].name);
-		}
-		if (xhr.readyState == 4 && xhr.status != 200) {
-			this.setState({
-				uploadError: xhr.responseText,
-				uploadProgress: 100
-			});
-		}
-	}.bind(this);
-	xhr.upload.onprogress = function (event) {
-		if (event.lengthComputable) {
-			var complete = (event.loaded / event.total * 100 | 0);
-			this.setState({
-				uploadProgress: complete
-			});
-		}
-	}.bind(this);
-
-	xhr.send(formData);
-}
-
-function onClearField(event) {
-    var $field = $(event.target).closest('.input').find('input');
-    if($field.data('state') == 'path'){
-        this.setState({
-            path: null
-        });
-    }
-    if($field.data('state') == 'alt'){
-        this.setState({
-            alt: null
-        });
-    }
 }
