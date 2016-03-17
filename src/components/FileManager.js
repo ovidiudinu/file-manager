@@ -4,78 +4,124 @@ import React from 'react'
 import Image from './Image'
 import Gallery from './Gallery'
 
-var basePath = '/uploads/';
-var images = [];
-for(var i = 1; i <= 18; i++){
-	images.push({
-		name: basePath + ("0000" + i).slice(-4)+'.jpg',
-		src: basePath + ("0000" + i).slice(-4)+'.jpg'
-	});
+var rootPath = '/';
+var basePath = 'images/';
+
+var gallery = {};
+gallery[rootPath + basePath] = [];
+gallery[rootPath + basePath + 'contributing-on-site-stacker-docs/'] = [];
+gallery[rootPath + basePath + 'develop-on-site-stacker/'] = [];
+
+for(var folder in gallery){
+    for(var i = 1; i <= 8; i++){
+        gallery[folder].push({
+            name: folder + ("0000" + i).slice(-4)+'.jpg',
+            src: folder + ("0000" + i).slice(-4)+'.jpg'
+        });
+    }
 }
 
 export default class FileManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            basePath: basePath,
-            gallery: images
+            currentPath: rootPath + basePath + 'contributing-on-site-stacker-docs/',
+            // currentPath: rootPath + basePath,
+            selectedImage: false,
+            altText: false,
+            gallery: gallery
         };
     }
-    
+
 	componentDidMount() {
-		this.refs.imageModal.show(null);
-        //this.refs.galleryModal.show(null);
+		this.refs.imageModal.show();
+        this.refs.galleryModal.show();
 	}
 
 	render() {
 		var ImageProps = {
-			//path: '/uploads/1000000000237780_1920x1080.jpg',
-			//alt: 'Some test image',
-			onOpenGallery: function(){
-                this.refs.galleryModal.show(null);
-            }.bind(this),
+            currentPath: this.state.currentPath,
+            gallery: this.state.gallery,
+            selectedImage: this.state.selectedImage,
+			onOpenGallery: () => {
+                this.refs.galleryModal.show();
+            },
+            onUrlChange: (event) => {
+                this.setState({
+                    selectedImage: {
+                        name: event.target.value,
+                        src: event.target.value
+                    }
+                });
+            },
+            onAltChange: (event) => {
+                this.setState({
+                    altText: event.target.value
+                });
+            },
 			onPastedContent: (base64data) => {
 				var ts = new Date().getTime();
 				var gallery = this.state.gallery;
-				gallery.push({
-					name: basePath + ts + '.jpg',
-					src: base64data
-				});
-				this.setState({
-					gallery: gallery
-				});
-				this.refs.imageModal.setPath(base64data);
+                var pastedImage = {
+                    name: this.state.currentPath + ts + '.jpg',
+                    src: base64data
+                };
+                gallery[this.state.currentPath].push(pastedImage);
+                this.setState({
+                    selectedImage: pastedImage
+                });
 			}
 		};
 		var GalleryProps = {
-			//selected: '/uploads/1000000000237780_1920x1080.jpg',
-            basePath: this.state.basePath,
+            currentPath: this.state.currentPath,
 			gallery: this.state.gallery,
-			onThumbnailClick: (path) => {
-				this.refs.imageModal.setPath(path);
+            selectedImage: this.state.selectedImage,
+            onThumbnailClick: (folder, name, src) => {
+                this.setState({
+                    currentPath: folder,
+                    selectedImage: {
+                        name: name,
+                        src: src
+                    }
+                });
 			},
-			onThumbnailDelete: (name, src) => {
-				var gallery = this.state.gallery;
-				var pathIndex = false;
-				gallery.forEach(function(obj, index){
-					if(obj.name == name){
-						pathIndex = index;
-					}
-				});
-				delete gallery[pathIndex];
-				this.setState({
-					gallery: gallery
-				});
+			onThumbnailDelete: (folder, fileName) => {
+                var gallery = this.state.gallery;
 
-				if(this.refs.imageModal.state.path == name){
-					this.refs.imageModal.setPath();
-				}
-			}
+                for(var folderProp in gallery){
+                    var pathIndex = false;
+                    if(folder == folderProp){
+                        gallery[folderProp].forEach(function(file, index){
+                            if(file.name == fileName){
+                                pathIndex = index;
+                            }
+                        });
+                        gallery[folderProp].splice(pathIndex, 1);
+                    }
+                }
+
+                this.setState({
+                    gallery: gallery
+                });
+
+                if(this.refs.imageModal.state.path == name){
+                    //this.refs.imageModal.setPath();
+                }
+
+			},
+            onFolderChange: (event) => {
+                event.preventDefault();
+                var $folderBtn = $(event.target);
+                var path = $folderBtn.data('folder-path');
+                this.setState({
+                    currentPath: path
+                });
+            }
 		};
         return (
             <div className="file-manager">
 	            <button className="ui labeled icon button primary" onClick={onClick.bind(this)}>
-		            <i className="upload icon"></i>
+		            <i className="upload icon"/>
 		            Upload
 	            </button>
 	            <Image ref="imageModal" {...ImageProps}/>
@@ -86,5 +132,5 @@ export default class FileManager extends React.Component {
 }
 
 function onClick() {
-	this.refs.imageModal.show(null);
+    this.refs.imageModal.show();
 }

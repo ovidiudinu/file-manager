@@ -2,14 +2,15 @@ require('./Gallery.scss');
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {onDragOver, onDragOut, onDropFiles, uploadFiles} from './Methods'
+import {onDragOver, onDragOut, onDropFiles, uploadFiles, getFolderFromGallery} from './Methods'
 
 export default class Gallery extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			selected: props.selected,
-			gallery: props.gallery,
+            currentPath: props.currentPath,
+            gallery: props.gallery,
+
             uploading: false,
             uploadError: false,
             uploadProgress: 0,
@@ -35,10 +36,11 @@ export default class Gallery extends React.Component {
                 });
             }
 		});
+
+        $(ReactDOM.findDOMNode(this.refs.breadcrumbDropdown)).dropdown();
 	}
 
-    show(callBack) {
-        this._callBack = callBack;
+    show() {
         $(ReactDOM.findDOMNode(this)).modal('show');
     }
 
@@ -51,21 +53,32 @@ export default class Gallery extends React.Component {
 	}
 
 	render() {
-		var thumbnails = [];
-		this.state.gallery.forEach(function (image, index) {
-			var selected = '';
-			if(image.src == this.state.selected) {selected = 'selected'}
-			thumbnails.push(
-				<a className={'card ' + selected} key={'thumbnail ' + index}>
-					<div className="image">
-						<img className="ui image" data-name={image.name} src={image.src} onClick={onThumbnailSelect.bind(this)}/>
-						<button className="ui icon red mini button" onClick={onThumbnailDelete.bind(this)}>
-							<i className="icon trash"/>
-						</button>
-					</div>
-				</a>
-			);
-		}.bind(this));
+        var galleryFolder = this.state.gallery[this.state.currentPath];
+
+        var thumbnails = [];
+        
+        if(!galleryFolder.length){
+            thumbnails = (
+                <p>There are no images in this folder yet. You can drag & drop files here if you want.</p>
+            );
+        }else{
+            galleryFolder.forEach((image, index) => {
+                var selectedCls = undefined;
+                if(this.props.selectedImage.name == image.name){
+                    selectedCls = 'selected';
+                }
+                thumbnails.push(
+                    <a className={'card ' + selectedCls} key={'thumbnail ' + index}>
+                        <div className="image">
+                            <img className="ui image" data-name={image.name} src={image.src} onClick={onThumbnailSelect.bind(this)}/>
+                            <button className="ui icon red mini button" onClick={onThumbnailDelete.bind(this)}>
+                                <i className="icon trash"/>
+                            </button>
+                        </div>
+                    </a>
+                );
+            });
+        }
 
         var progressBar = 'Drag files over the gallery to upload new images';
         if(this.state.uploading){
@@ -77,11 +90,62 @@ export default class Gallery extends React.Component {
             );
         }
 
+        var folders = this.state.currentPath.split('/');
+        folders = folders.filter(function(value){
+            return value.length > 0
+        });
+        var breadcrumb = [];
+        folders.forEach((folder, index) => {
+            var isLast = index+1 == folders.length;
+            if(!isLast){
+                //todo: find a way to replace hardcoded /images/ data-folder-path on first item
+                breadcrumb.push(
+                    <a key={'bc_section ' + index} className="section" data-folder-path='/images/' onClick={this.props.onFolderChange}>{folder}</a>
+                );
+                breadcrumb.push(
+                    <div key={'divider ' + index} className="divider"> / </div>
+                );
+            }else{
+                var breadcrumbMenu = [];
+                var y = 0;
+                for(var galleryFolder in this.state.gallery){
+                    var galleryFolderParts = galleryFolder.split('/');
+                    galleryFolderParts = galleryFolderParts.filter(function(value){
+                        return value.length > 0
+                    });
+                    galleryFolderParts.shift();
+                    galleryFolderParts.join('');
+
+                    if(galleryFolder != this.state.currentPath && galleryFolderParts != ''){
+                        breadcrumbMenu.push(
+                            <div key={'bc_section_item ' +y} className="item" data-folder-path={galleryFolder} onClick={this.props.onFolderChange}>
+                                <div className="description"><a className="ui blue circular label mini" style={{marginTop: -2}}>{this.state.gallery[galleryFolder].length}</a></div>
+                                {galleryFolderParts}
+                            </div>
+                        );
+                    }
+                    y++;
+                }
+                
+                breadcrumb.push(
+                    <div key={'bc_dropdown ' + index} className="ui dropdown item" ref="breadcrumbDropdown">
+                        <div className="text">{folder}</div>
+                        <i className="dropdown icon"/>
+                        <div className="menu" style={{marginTop: 5, minWidth: '100%'}}>
+                            {breadcrumbMenu}
+                        </div>
+                    </div>
+                );
+            }
+        });
+
 		return (
 			<div className="ui large modal gallery" onDragOver={onDragOver.bind(this)}>
                 <i className="close icon"/>
                 <div className="header">
-                    Image Gallery
+                    <div className="ui breadcrumb">
+                        {breadcrumb}
+                    </div>
                 </div>
                 <div ref="dropZone" className={"ui dimmer inverted drop-zone drop-zone-receiver " + (this.state.dragOver ? 'dragover' : '')} onDragLeave={onDragOut.bind(this)} onDrop={onDropFiles.bind(this)}>
                     <div className="ui content">
@@ -116,19 +180,18 @@ export default class Gallery extends React.Component {
 
 
 Gallery.propTypes = {
-	selected: React.PropTypes.string,
-	gallery: React.PropTypes.array,
-	onThumbnailClick: React.PropTypes.func
+    currentPath: React.PropTypes.string,
+	gallery: React.PropTypes.object,
+	onThumbnailClick: React.PropTypes.func,
+    onThumbnailDelete: React.PropTypes.func
 };
 
 function onThumbnailSelect(event) {
     var $thumbnail = $(event.target);
 	var name = $thumbnail.data('name');
 	var src = $thumbnail.attr('src');
-	this.props.onThumbnailClick(src);
-	this.setState({
-		selected: name
-	});
+
+    this.props.onThumbnailClick(this.state.currentPath, name, src);
 	$(ReactDOM.findDOMNode(this)).modal('hide');
 }
 
@@ -136,6 +199,5 @@ function onThumbnailDelete(event) {
 	var $selectBtn = $(event.target);
 	var $thumbnail = $selectBtn.closest('.card').find('img');
 	var name = $thumbnail.data('name');
-	var src = $thumbnail.attr('src');
-	this.props.onThumbnailDelete(name, src);
+	this.props.onThumbnailDelete(this.state.currentPath, name);
 }

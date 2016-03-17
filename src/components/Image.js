@@ -8,10 +8,10 @@ export default class Image extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			src: props.src,
-			path: props.path,
-			alt: props.alt,
-			uploading: false,
+            currentPath: props.currentPath,
+            gallery: props.gallery,
+
+            uploading: false,
 			uploadError: false,
 			uploadProgress: 0,
 			dragOver: false
@@ -54,8 +54,7 @@ export default class Image extends React.Component {
 		});
 	}
 
-	show(callBack) {
-		this._callBack = callBack;
+	show() {
 		$(ReactDOM.findDOMNode(this)).modal('show');
 	}
 
@@ -81,7 +80,7 @@ export default class Image extends React.Component {
 						<div className="ui padded fluid grid">
 							<div className="four wide column">
 								<div className="ui segment">
-									<img className="ui fluid image" src={this.state.src ? this.state.src : '/img/blank.png'} onClick={openGallery.bind(this)}/>
+									<img className="ui fluid image" src={this.props.selectedImage.src ? this.props.selectedImage.src : '/img/blank.png'} onClick={this.props.onOpenGallery}/>
 								</div>
 							</div>
 							<div className="twelve wide column">
@@ -90,13 +89,13 @@ export default class Image extends React.Component {
 									<div className="ui action input fluid">
 										<input ref="path"
 										       data-state="path"
-										       value={this.state.path}
+										       value={this.props.selectedImage.name}
 										       type="text"
 										       placeholder="Insert link, select from gallery or paste image data..."
-										       onChange={onPathChange.bind(this)}
+										       onChange={this.props.onUrlChange}
                                                onPaste={onPaste.bind(this)}
 										/>
-										<button className="ui icon button show-gallery" onClick={openGallery.bind(this)}>
+										<button className="ui icon button show-gallery" onClick={this.props.onOpenGallery}>
 											<i className="folder open icon"/>
 										</button>
 									</div>
@@ -106,10 +105,10 @@ export default class Image extends React.Component {
 									<div className={"ui input fluid"}>
 										<input ref="alt"
 										       data-state="alt"
-										       value={this.state.alt}
+										       value={this.state.altText}
 										       type="text"
 										       placeholder="Alt text"
-										       onChange={onAltChange.bind(this)}
+										       onChange={this.props.onAltChange}
 										/>
 									</div>
 								</div>
@@ -148,44 +147,16 @@ export default class Image extends React.Component {
 				</div>
 			</div>
 		)
-
     }
-
-	setPath(src, path) {
-		if(!src) src = '';
-		if(!path) path = '';
-		this.setState({
-			src: src,
-			path: path
-		});
-	}
-
-	setAlt(alt) {
-		if(!alt) alt = '';
-		this.setState({
-			alt: alt
-		});
-	}
 }
 
 Image.propTypes = {
-	src: React.PropTypes.string,
-	path: React.PropTypes.string,
-	alt: React.PropTypes.string,
-    onOpenGallery: React.PropTypes.func
+    currentPath: React.PropTypes.string,
+    gallery: React.PropTypes.object,
+    onOpenGallery: React.PropTypes.func,
+    onUrlChange: React.PropTypes.func,
+    onAltChange: React.PropTypes.func
 };
-
-function openGallery() {
-    this.props.onOpenGallery();
-}
-
-function onPathChange(event) {
-	//this.setPath(event.target.value);
-}
-
-function onAltChange(event) {
-	this.setAlt(event.target.value);
-}
 
 function onManualUploadChange(event) {
 	var files = event.target.files;
