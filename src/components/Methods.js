@@ -27,9 +27,7 @@ export function onPaste(event) {
         var itemData = item.getAsFile();
         var reader = new FileReader();
         reader.onload = function (event) {
-            this.setState({
-                path: event.target.result
-            });
+	        this.props.onPastedContent(event.target.result);
         }.bind(this);
         reader.readAsDataURL(itemData);
     }

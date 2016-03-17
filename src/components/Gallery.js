@@ -54,11 +54,11 @@ export default class Gallery extends React.Component {
 		var thumbnails = [];
 		this.state.gallery.forEach(function (image, index) {
 			var selected = '';
-			if(image.src == this.state.selected) {selected = 'selected'};
+			if(image.src == this.state.selected) {selected = 'selected'}
 			thumbnails.push(
 				<a className={'card ' + selected} key={'thumbnail ' + index}>
 					<div className="image">
-						<img className="ui image" src={this.props.basePath + image.src} onClick={onThumbnailSelect.bind(this)}/>
+						<img className="ui image" data-name={image.name} src={image.src} onClick={onThumbnailSelect.bind(this)}/>
 						<button className="ui icon red mini button" onClick={onThumbnailDelete.bind(this)}>
 							<i className="icon trash"/>
 						</button>
@@ -123,10 +123,11 @@ Gallery.propTypes = {
 
 function onThumbnailSelect(event) {
     var $thumbnail = $(event.target);
-	var path = $thumbnail.attr('src');
-	this.props.onThumbnailClick(path);
+	var name = $thumbnail.data('name');
+	var src = $thumbnail.attr('src');
+	this.props.onThumbnailClick(src);
 	this.setState({
-		selected: path
+		selected: name
 	});
 	$(ReactDOM.findDOMNode(this)).modal('hide');
 }
@@ -134,14 +135,7 @@ function onThumbnailSelect(event) {
 function onThumbnailDelete(event) {
 	var $selectBtn = $(event.target);
 	var $thumbnail = $selectBtn.closest('.card').find('img');
-	var path = $thumbnail.attr('src');
-
-	console.warn('Implement server side image removal');
-
-	var gallery = this.state.gallery;
-	var pathIndex = gallery.indexOf(path);
-	delete gallery[pathIndex];
-	this.setState({
-		gallery: gallery
-	});
+	var name = $thumbnail.data('name');
+	var src = $thumbnail.attr('src');
+	this.props.onThumbnailDelete(name, src);
 }

@@ -8,6 +8,7 @@ export default class Image extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			src: props.src,
 			path: props.path,
 			alt: props.alt,
 			uploading: false,
@@ -80,7 +81,7 @@ export default class Image extends React.Component {
 						<div className="ui padded fluid grid">
 							<div className="four wide column">
 								<div className="ui segment">
-									<img className="ui fluid image" src={this.state.path ? this.state.path : '/img/blank.png'} onClick={openGallery.bind(this)}/>
+									<img className="ui fluid image" src={this.state.src ? this.state.src : '/img/blank.png'} onClick={openGallery.bind(this)}/>
 								</div>
 							</div>
 							<div className="twelve wide column">
@@ -150,9 +151,11 @@ export default class Image extends React.Component {
 
     }
 
-	setPath(path) {
+	setPath(src, path) {
+		if(!src) src = '';
 		if(!path) path = '';
 		this.setState({
+			src: src,
 			path: path
 		});
 	}
@@ -166,6 +169,7 @@ export default class Image extends React.Component {
 }
 
 Image.propTypes = {
+	src: React.PropTypes.string,
 	path: React.PropTypes.string,
 	alt: React.PropTypes.string,
     onOpenGallery: React.PropTypes.func
@@ -176,7 +180,7 @@ function openGallery() {
 }
 
 function onPathChange(event) {
-	this.setPath(event.target.value);
+	//this.setPath(event.target.value);
 }
 
 function onAltChange(event) {
