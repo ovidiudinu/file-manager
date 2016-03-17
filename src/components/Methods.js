@@ -34,13 +34,24 @@ export function onPaste(event) {
 }
 
 export function uploadFiles(files) {
+	for(var x = 0; x < files.length; x++){
+		var file = files[x];
+		var reader = new FileReader();
+		reader.onload = function (total, event) {
+			this.props.onPastedContent(event.target.result);
+		}.bind(this, files.length);
+		reader.readAsDataURL(file);
+	}
+}
+
+export function uploadFiles_(files) {
     this.setState({
         uploading: true,
         uploadError: false,
         uploadProgress: 0
     });
 
-    var formData = new FormData();
+	var formData = new FormData();
     for (var i = 0; i < files.length; i++) {
         formData.append('file', files[i]);
     }

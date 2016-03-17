@@ -11,22 +11,25 @@ var gallery = {};
 gallery[rootPath + basePath] = [];
 gallery[rootPath + basePath + 'contributing-on-site-stacker-docs/'] = [];
 gallery[rootPath + basePath + 'develop-on-site-stacker/'] = [];
+gallery[rootPath + basePath + 'empty-folder/'] = [];
 
 for(var folder in gallery){
-    for(var i = 1; i <= 8; i++){
-        gallery[folder].push({
-            name: folder + ("0000" + i).slice(-4)+'.jpg',
-            src: folder + ("0000" + i).slice(-4)+'.jpg'
-        });
-    }
+	if(folder.indexOf('empty-folder') < 0) {
+		for (var i = 1; i <= 8; i++) {
+			gallery[folder].push({
+				name: folder + ("0000" + i).slice(-4) + '.jpg',
+				src: folder + ("0000" + i).slice(-4) + '.jpg'
+			});
+		}
+	}
 }
 
 export default class FileManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentPath: rootPath + basePath + 'contributing-on-site-stacker-docs/',
-            // currentPath: rootPath + basePath,
+            // currentPath: rootPath + basePath + 'contributing-on-site-stacker-docs/',
+            currentPath: rootPath + basePath,
             selectedImage: false,
             altText: false,
             gallery: gallery
@@ -116,7 +119,19 @@ export default class FileManager extends React.Component {
                 this.setState({
                     currentPath: path
                 });
-            }
+            },
+			onPastedContent: (base64data) => {
+				var ts = new Date().getTime();
+				var gallery = this.state.gallery;
+				var pastedImage = {
+					name: this.state.currentPath + ts + '.jpg',
+					src: base64data
+				};
+				gallery[this.state.currentPath].push(pastedImage);
+				this.setState({
+					selectedImage: pastedImage
+				});
+			}
 		};
         return (
             <div className="file-manager">

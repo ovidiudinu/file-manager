@@ -8,9 +8,6 @@ export default class Image extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            currentPath: props.currentPath,
-            gallery: props.gallery,
-
             uploading: false,
 			uploadError: false,
 			uploadProgress: 0,
@@ -71,7 +68,7 @@ export default class Image extends React.Component {
 		}
 
 		return (
-            <div className="ui small modal image">
+            <div className="ui small modal image" onPaste={onPaste.bind(this)}>
 				<div className="header">
 					Insert Image
 				</div>
@@ -93,7 +90,7 @@ export default class Image extends React.Component {
 										       type="text"
 										       placeholder="Insert link, select from gallery or paste image data..."
 										       onChange={this.props.onUrlChange}
-                                               onPaste={onPaste.bind(this)}
+
 										/>
 										<button className="ui icon button show-gallery" onClick={this.props.onOpenGallery}>
 											<i className="folder open icon"/>

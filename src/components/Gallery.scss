@@ -71,4 +71,16 @@
             max-height: none;
         }
     }
+	.folders-breadcrumb {
+		.dropdown.item {
+			.item {
+				padding-right: 40px !important;
+				position: relative;
+				.description {
+					position: absolute;
+					right: 10px;
+				}
+			}
+		}
+	}
 }

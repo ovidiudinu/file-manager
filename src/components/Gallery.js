@@ -2,15 +2,12 @@ require('./Gallery.scss');
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {onDragOver, onDragOut, onDropFiles, uploadFiles, getFolderFromGallery} from './Methods'
+import {onDragOver, onDragOut, onDropFiles, uploadFiles, onPaste} from './Methods'
 
 export default class Gallery extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            currentPath: props.currentPath,
-            gallery: props.gallery,
-
             uploading: false,
             uploadError: false,
             uploadProgress: 0,
@@ -50,10 +47,12 @@ export default class Gallery extends React.Component {
         $(ReactDOM.findDOMNode(this.refs.progressBar)).progress({
             percent: this.state.uploadProgress
         });
+
+		$(ReactDOM.findDOMNode(this.refs.breadcrumbDropdown)).dropdown();
 	}
 
 	render() {
-        var galleryFolder = this.state.gallery[this.state.currentPath];
+        var galleryFolder = this.props.gallery[this.props.currentPath];
 
         var thumbnails = [];
         
@@ -90,7 +89,7 @@ export default class Gallery extends React.Component {
             );
         }
 
-        var folders = this.state.currentPath.split('/');
+        var folders = this.props.currentPath.split('/');
         folders = folders.filter(function(value){
             return value.length > 0
         });
@@ -108,7 +107,7 @@ export default class Gallery extends React.Component {
             }else{
                 var breadcrumbMenu = [];
                 var y = 0;
-                for(var galleryFolder in this.state.gallery){
+                for(var galleryFolder in this.props.gallery){
                     var galleryFolderParts = galleryFolder.split('/');
                     galleryFolderParts = galleryFolderParts.filter(function(value){
                         return value.length > 0
@@ -116,10 +115,11 @@ export default class Gallery extends React.Component {
                     galleryFolderParts.shift();
                     galleryFolderParts.join('');
 
-                    if(galleryFolder != this.state.currentPath && galleryFolderParts != ''){
-                        breadcrumbMenu.push(
+                    if(galleryFolder != this.props.currentPath && galleryFolderParts != ''){
+	                    var imageCount = this.props.gallery[galleryFolder].length;
+	                    breadcrumbMenu.push(
                             <div key={'bc_section_item ' +y} className="item" data-folder-path={galleryFolder} onClick={this.props.onFolderChange}>
-                                <div className="description"><a className="ui blue circular label mini" style={{marginTop: -2}}>{this.state.gallery[galleryFolder].length}</a></div>
+                                <div className="description"><a className={"ui circular label mini " + (imageCount == 0 ? 'grey' : 'blue')} style={{marginTop: -2}}>{imageCount}</a></div>
                                 {galleryFolderParts}
                             </div>
                         );
@@ -140,10 +140,10 @@ export default class Gallery extends React.Component {
         });
 
 		return (
-			<div className="ui large modal gallery" onDragOver={onDragOver.bind(this)}>
+			<div className="ui large modal gallery" onDragOver={onDragOver.bind(this)} onPaste={onPaste.bind(this)}>
                 <i className="close icon"/>
                 <div className="header">
-                    <div className="ui breadcrumb">
+                    <div className="ui breadcrumb folders-breadcrumb">
                         {breadcrumb}
                     </div>
                 </div>
@@ -191,7 +191,7 @@ function onThumbnailSelect(event) {
 	var name = $thumbnail.data('name');
 	var src = $thumbnail.attr('src');
 
-    this.props.onThumbnailClick(this.state.currentPath, name, src);
+    this.props.onThumbnailClick(this.props.currentPath, name, src);
 	$(ReactDOM.findDOMNode(this)).modal('hide');
 }
 
@@ -199,5 +199,5 @@ function onThumbnailDelete(event) {
 	var $selectBtn = $(event.target);
 	var $thumbnail = $selectBtn.closest('.card').find('img');
 	var name = $thumbnail.data('name');
-	this.props.onThumbnailDelete(this.state.currentPath, name);
+	this.props.onThumbnailDelete(this.props.currentPath, name);
 }
