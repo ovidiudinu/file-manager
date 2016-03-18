@@ -45,7 +45,17 @@ export default class Gallery extends React.Component {
 		$(ReactDOM.findDOMNode(this)).modal('refresh');
 
         $(ReactDOM.findDOMNode(this.refs.progressBar)).progress({
-            percent: this.state.uploadProgress
+            percent: this.state.uploadProgress,
+            autoSuccess: true,
+            limitValues: true,
+            onSuccess: () => {
+                setTimeout(() => {
+                    this.setState({
+                        uploading: false,
+                        uploadProgress: 0
+                    });
+                }, 500);
+            }
         });
 
 		$(ReactDOM.findDOMNode(this.refs.breadcrumbDropdown)).dropdown();
@@ -58,7 +68,15 @@ export default class Gallery extends React.Component {
         
         if(!galleryFolder.length){
             thumbnails = (
-                <p>There are no images in this folder yet. You can drag & drop files here if you want.</p>
+                <div className="header">
+                    <div className="ui hidden divider"></div>
+                    <h2>
+                        <i className="ban icon"/>
+                        Selected folder is empty
+                    </h2>
+                    <div className="sub header">You can drag and drop files or click and paste data from your clipboard</div>
+                    <div className="ui hidden divider"></div>
+                </div>
             );
         }else{
             galleryFolder.forEach((image, index) => {
@@ -158,7 +176,7 @@ export default class Gallery extends React.Component {
                     </div>
                 </div>
                 <div className="ui content">
-                    <div ref="gallery" className="ui five stackable cards"
+                    <div ref="gallery" className={(galleryFolder.length ? "ui five stackable cards" : "ui basic center aligned segment")}
                          style={{overflow: 'auto', height: this.state.contentHeight + 'px'}}>
                         {thumbnails}
                     </div>

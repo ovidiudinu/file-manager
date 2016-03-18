@@ -47,7 +47,17 @@ export default class Image extends React.Component {
 		$(ReactDOM.findDOMNode(this)).modal('refresh');
 
 		$(ReactDOM.findDOMNode(this.refs.progressBar)).progress({
-			percent: this.state.uploadProgress
+			percent: this.state.uploadProgress,
+            autoSuccess: true,
+            limitValues: true,
+            onSuccess: () => {
+                setTimeout(() => {
+                    this.setState({
+                        uploading: false,
+                        uploadProgress: 0
+                    });
+                }, 500);
+            }
 		});
 	}
 

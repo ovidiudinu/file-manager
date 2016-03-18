@@ -28,8 +28,8 @@ export default class FileManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // currentPath: rootPath + basePath + 'contributing-on-site-stacker-docs/',
-            currentPath: rootPath + basePath,
+            currentPath: rootPath + basePath + 'empty-folder/',
+            // currentPath: rootPath + basePath,
             selectedImage: false,
             altText: false,
             gallery: gallery
@@ -62,7 +62,7 @@ export default class FileManager extends React.Component {
                     altText: event.target.value
                 });
             },
-			onPastedContent: (base64data) => {
+			onPastedContent: (base64data, setValue) => {
 				var ts = new Date().getTime();
 				var gallery = this.state.gallery;
                 var pastedImage = {
@@ -71,8 +71,13 @@ export default class FileManager extends React.Component {
                 };
                 gallery[this.state.currentPath].push(pastedImage);
                 this.setState({
-                    selectedImage: pastedImage
+                    gallery: gallery
                 });
+                if(setValue && setValue == true){
+                    this.setState({
+                        selectedImage: pastedImage
+                    });
+                }
 			}
 		};
 		var GalleryProps = {
@@ -107,8 +112,8 @@ export default class FileManager extends React.Component {
                     gallery: gallery
                 });
 
-                if(this.refs.imageModal.state.path == name){
-                    //this.refs.imageModal.setPath();
+                if(fileName == this.state.selectedImage.name){
+                    this.state.selectedImage = '';
                 }
 
 			},
@@ -120,7 +125,7 @@ export default class FileManager extends React.Component {
                     currentPath: path
                 });
             },
-			onPastedContent: (base64data) => {
+			onPastedContent: (base64data, setValue) => {
 				var ts = new Date().getTime();
 				var gallery = this.state.gallery;
 				var pastedImage = {
@@ -128,9 +133,14 @@ export default class FileManager extends React.Component {
 					src: base64data
 				};
 				gallery[this.state.currentPath].push(pastedImage);
-				this.setState({
-					selectedImage: pastedImage
-				});
+                this.setState({
+                    gallery: gallery
+                });
+                if(setValue && setValue == true){
+                    this.setState({
+                        selectedImage: pastedImage
+                    });
+                }
 			}
 		};
         return (
